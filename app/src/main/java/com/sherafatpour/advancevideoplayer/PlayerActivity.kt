@@ -96,7 +96,10 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
         iconModelArrayList.add(IconModel(R.drawable.ic_volume_off,"Mute",IconType.MUTE))
         iconModelArrayList.add(IconModel(R.drawable.ic_rotate,"Rotate",IconType.ROTATE))
 
-        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList)
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList){ iconModel ->
+
+            iconItemClicked(iconModel)
+        }
 
         recyclerViewIcons.apply {
             adapter = playbackIconsAdapter
@@ -106,6 +109,30 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
     }
 
 
+    private fun iconItemClicked(partItem : IconModel) {
+
+                           when(partItem.type){
+                               IconType.NIGHT -> {
+                                   Toast.makeText(this, "NIGHT",
+                                       Toast.LENGTH_SHORT).show()
+                               }
+                               IconType.MUTE -> {
+                                   Toast.makeText(this, "MUTE",
+                                       Toast.LENGTH_SHORT).show()
+                               }
+                               IconType.ROTATE -> {
+                                   Toast.makeText(this, "ROTATE",
+                                       Toast.LENGTH_SHORT).show()
+                               }
+                               IconType.BACK -> {
+                                   Toast.makeText(this, "BACK",
+                                       Toast.LENGTH_SHORT).show()
+                               }
+
+
+                               else -> {}
+                           }
+    }
     private fun addMP4Files() {
         val mediaItem1 = MediaItem.fromUri(getString(R.string.media_url_mkv))
         val mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4))

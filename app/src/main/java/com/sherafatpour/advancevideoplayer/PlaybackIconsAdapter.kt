@@ -7,8 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sherafatpour.advancevideoplayer.IconType.*
 import com.sherafatpour.advancevideoplayer.databinding.IconsLayoutBinding
 
-class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>)
+class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>,private val clickListener: (IconModel) -> Unit)
     :RecyclerView.Adapter<PlaybackIconsAdapter.PlaybackIconViewHolder>() {
+
+
+
+    public interface OnItemClickListener{
+        fun onIemClick(position:Int)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaybackIconViewHolder {
         val binding =
@@ -23,8 +29,7 @@ class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>)
             with(iconModelList[position]) {
 
 
-                binding.playbackIcon.setImageResource(imageView)
-                binding.iconTitle.text = iconModelList[position].iconTitle
+                holder.bind(iconModelList[position],clickListener)
 
            /*     holder.itemView.setOnClickListener {
                     when(iconModelList[position].type){
@@ -53,7 +58,13 @@ class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>)
 
 
 
-    inner class PlaybackIconViewHolder( val binding: IconsLayoutBinding)
-        :RecyclerView.ViewHolder(binding.root)
+    inner class PlaybackIconViewHolder(private val binding: IconsLayoutBinding)
+        :RecyclerView.ViewHolder(binding.root){
+        fun bind(part: IconModel, clickListener: (IconModel) -> Unit) {
+            binding.playbackIcon.setImageResource(part.imageView)
+            binding.iconTitle.text = part.iconTitle
+            binding.root.setOnClickListener { clickListener(part) }
+        }
+        }
 
 }
