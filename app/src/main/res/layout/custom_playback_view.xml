@@ -13,7 +13,9 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:id="@+id/toolbar"
+            android:background="#B3000000"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="visible">
@@ -45,7 +47,18 @@
                 android:src="@drawable/ic_more" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+<androidx.recyclerview.widget.RecyclerView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/recyclerView_icon"
+    android:layout_below="@id/toolbar"
+    android:layout_alignParentStart="true"
+
+    />
+
+
         <RelativeLayout
+            android:background="#B3000000"
             android:id="@+id/progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,11 +107,13 @@
         </RelativeLayout>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:background="#B3000000"
+
             android:id="@+id/bottom_icons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="5dp"
+            android:padding="5dp"
             android:gravity="center_vertical"
             android:weightSum="7">
 
@@ -159,4 +174,17 @@
                 android:src="@drawable/ic_aspect_ratio" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/lock"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="361dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_lock"
+        android:visibility="invisible" />
 </RelativeLayout>

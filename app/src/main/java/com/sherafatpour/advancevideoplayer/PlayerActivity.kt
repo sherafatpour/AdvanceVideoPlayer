@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -18,13 +20,29 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource.EventListene
 import com.google.common.collect.ImmutableList
 import com.sherafatpour.advancevideoplayer.databinding.ActivityPlayerBinding
 import androidx.activity.addCallback
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import java.util.concurrent.locks.Lock
 
-class PlayerActivity : AppCompatActivity(), Player.Listener {
+class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListener {
     private lateinit var player: ExoPlayer
     private lateinit var title: TextView
     private lateinit var playerView: PlayerView
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityPlayerBinding
+    private lateinit var lock: ImageView
+    private lateinit var unLock: ImageView
+    private lateinit var scaling: ImageView
+    private lateinit var root: RelativeLayout
+    private lateinit var recyclerViewIcons: RecyclerView
+    lateinit var controlsMode: ControlsMode
+    lateinit var playbackIconsAdapter: PlaybackIconsAdapter
+
+    //horizontal recyclerview variables
+    var iconModelArrayList = arrayListOf<IconModel>()
+
+    enum class ControlsMode { LOCK, FULLSCREEN }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -34,10 +52,24 @@ class PlayerActivity : AppCompatActivity(), Player.Listener {
         setContentView(binding.root)
         playerView = binding.exoplayerView
         title = playerView.findViewById(R.id.video_title)
-        title.text = "TIIIITLE"
+        lock = playerView.findViewById(R.id.lock)
+        unLock = playerView.findViewById(R.id.unlock)
+        root = playerView.findViewById(R.id.root_layout)
+        scaling = playerView.findViewById(R.id.scaling)
+        recyclerViewIcons = playerView.findViewById(R.id.recyclerView_icon)
+
+        //title.text = "TIIIITLE"
         playerView.player = player
         playerView.keepScreenOn = true
+
+        lock.setOnClickListener(this)
+        unLock.setOnClickListener(this)
+        root.setOnClickListener(this)
+        scaling.setOnClickListener(this)
+
         setupPlayer()
+        initIconsRecyclerview()
+
         addMP3()
         addMP4Files()
 
@@ -54,7 +86,23 @@ class PlayerActivity : AppCompatActivity(), Player.Listener {
         }
 
         onBackPress()
-      //  setFullScreen()
+        //  setFullScreen()
+    }
+
+    private fun initIconsRecyclerview() {
+
+        iconModelArrayList.add(IconModel(R.drawable.ic_right,"",IconType.BACK))
+        iconModelArrayList.add(IconModel(R.drawable.ic_night_mode,"Night",IconType.NIGHT))
+        iconModelArrayList.add(IconModel(R.drawable.ic_volume_off,"Mute",IconType.MUTE))
+        iconModelArrayList.add(IconModel(R.drawable.ic_rotate,"Rotate",IconType.ROTATE))
+
+        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList)
+
+        recyclerViewIcons.apply {
+            adapter = playbackIconsAdapter
+            layoutManager = LinearLayoutManager(this@PlayerActivity,RecyclerView.HORIZONTAL,true)
+        }
+
     }
 
 
@@ -166,7 +214,7 @@ class PlayerActivity : AppCompatActivity(), Player.Listener {
         })
     }
 
-    private fun setFullScreen(){
+    private fun setFullScreen() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
@@ -175,6 +223,63 @@ class PlayerActivity : AppCompatActivity(), Player.Listener {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN
             )
         }
+    }
+
+    override fun onClick(v: View?) {
+
+
+        when (v!!.id) {
+
+            R.id.lock -> {
+                controlsMode = ControlsMode.FULLSCREEN
+                root.visibility = View.VISIBLE
+                lock.visibility = View.INVISIBLE
+                Toast.makeText(this@PlayerActivity, "unlocked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.unlock -> {
+                controlsMode = ControlsMode.LOCK
+                root.visibility = View.INVISIBLE
+                lock.visibility = View.VISIBLE
+                Toast.makeText(this@PlayerActivity, "Locked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.scaling -> {}
+
+
+        }
+
+    }
+
+    private val firstListener: View.OnClickListener = View.OnClickListener {
+
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+        player.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
+        scaling.setImageResource(R.drawable.ic_fullscreen)
+        Toast.makeText(this@PlayerActivity, "Full Screen", Toast.LENGTH_SHORT).show()
+
+        scaling.setOnClickListener(secondListener)
+
+    }
+
+    private val secondListener: View.OnClickListener = View.OnClickListener {
+
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        player.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
+        scaling.setImageResource(R.drawable.ic_zoom)
+        Toast.makeText(this@PlayerActivity, "Zoom", Toast.LENGTH_SHORT).show()
+
+        scaling.setOnClickListener(thirdListener)
+
+    }
+
+    private val thirdListener: View.OnClickListener = View.OnClickListener {
+
+        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+        player.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
+        scaling.setImageResource(R.drawable.ic_fit)
+        Toast.makeText(this@PlayerActivity, "Fit", Toast.LENGTH_SHORT).show()
+
+        scaling.setOnClickListener(firstListener)
+
     }
 
 
