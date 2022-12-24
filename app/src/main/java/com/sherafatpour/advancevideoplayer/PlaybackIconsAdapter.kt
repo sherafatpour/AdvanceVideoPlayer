@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sherafatpour.advancevideoplayer.IconType.*
 import com.sherafatpour.advancevideoplayer.databinding.IconsLayoutBinding
 
-class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>,private val clickListener: (IconModel) -> Unit)
+class PlaybackIconsAdapter(private val iconModelList: List<IconModel>,private val clickListener: (IconModel,Int) -> Unit)
     :RecyclerView.Adapter<PlaybackIconsAdapter.PlaybackIconViewHolder>() {
 
 
@@ -29,7 +29,7 @@ class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>,priva
             with(iconModelList[position]) {
 
 
-                holder.bind(iconModelList[position],clickListener)
+                holder.bind(iconModelList[position],position,clickListener)
 
            /*     holder.itemView.setOnClickListener {
                     when(iconModelList[position].type){
@@ -60,10 +60,10 @@ class PlaybackIconsAdapter(private val iconModelList: ArrayList<IconModel>,priva
 
     inner class PlaybackIconViewHolder(private val binding: IconsLayoutBinding)
         :RecyclerView.ViewHolder(binding.root){
-        fun bind(part: IconModel, clickListener: (IconModel) -> Unit) {
+        fun bind(part: IconModel,position:Int, clickListener: (IconModel,Int) -> Unit) {
             binding.playbackIcon.setImageResource(part.imageView)
             binding.iconTitle.text = part.iconTitle
-            binding.root.setOnClickListener { clickListener(part) }
+            binding.root.setOnClickListener { clickListener(part,position) }
         }
         }
 

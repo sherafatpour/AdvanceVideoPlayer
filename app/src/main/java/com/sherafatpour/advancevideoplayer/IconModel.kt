@@ -5,4 +5,4 @@ data class IconModel(
     var iconTitle:String,
     var type:IconType
 )
-enum class IconType { NIGHT,MUTE ,ROTATE,BACK }
+enum class IconType { NIGHT,MUTE ,ROTATE,BACK,VOLUME,BRIGHTNESS,EQUALIZER,SPEED,SUBTITLE,COLLAPSE }

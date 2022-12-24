@@ -13,23 +13,20 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.navigation.ui.AppBarConfiguration
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource.EventListener
 import com.google.common.collect.ImmutableList
 import com.sherafatpour.advancevideoplayer.databinding.ActivityPlayerBinding
 import androidx.activity.addCallback
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import java.util.concurrent.locks.Lock
 
 class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListener {
     private lateinit var player: ExoPlayer
     private lateinit var title: TextView
     private lateinit var playerView: PlayerView
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityPlayerBinding
     private lateinit var lock: ImageView
     private lateinit var unLock: ImageView
@@ -38,9 +35,10 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
     private lateinit var recyclerViewIcons: RecyclerView
     lateinit var controlsMode: ControlsMode
     lateinit var playbackIconsAdapter: PlaybackIconsAdapter
-
+    var expand :Boolean = false
+    val iconModelArrayList = ArrayList<IconModel>()
     //horizontal recyclerview variables
-    var iconModelArrayList = arrayListOf<IconModel>()
+    var iconModelLive = MutableLiveData<List<IconModel>>()
 
     enum class ControlsMode { LOCK, FULLSCREEN }
 
@@ -61,6 +59,7 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
         //title.text = "TIIIITLE"
         playerView.player = player
         playerView.keepScreenOn = true
+        player.playWhenReady = true
 
         lock.setOnClickListener(this)
         unLock.setOnClickListener(this)
@@ -86,52 +85,131 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
         }
 
         onBackPress()
-        //  setFullScreen()
+         setFullScreen()
     }
 
     private fun initIconsRecyclerview() {
+
 
         iconModelArrayList.add(IconModel(R.drawable.ic_right,"",IconType.BACK))
         iconModelArrayList.add(IconModel(R.drawable.ic_night_mode,"Night",IconType.NIGHT))
         iconModelArrayList.add(IconModel(R.drawable.ic_volume_off,"Mute",IconType.MUTE))
         iconModelArrayList.add(IconModel(R.drawable.ic_rotate,"Rotate",IconType.ROTATE))
 
-        playbackIconsAdapter = PlaybackIconsAdapter(iconModelArrayList){ iconModel ->
+        iconModelLive.postValue(iconModelArrayList)
 
-            iconItemClicked(iconModel)
+        iconModelLive.observe(this){
+            playbackIconsAdapter = PlaybackIconsAdapter(it ){iconModel , position  ->
+                iconItemClicked(iconModel,position)
+
+            }
+            recyclerViewIcons.apply {
+                adapter = playbackIconsAdapter
+                layoutManager = LinearLayoutManager(this@PlayerActivity,RecyclerView.HORIZONTAL,true)
+            }
         }
 
-        recyclerViewIcons.apply {
-            adapter = playbackIconsAdapter
-            layoutManager = LinearLayoutManager(this@PlayerActivity,RecyclerView.HORIZONTAL,true)
-        }
+
+
+
 
     }
 
 
-    private fun iconItemClicked(partItem : IconModel) {
+    private fun iconItemClicked(partItem : IconModel,position:Int ) {
 
-                           when(partItem.type){
-                               IconType.NIGHT -> {
-                                   Toast.makeText(this, "NIGHT",
-                                       Toast.LENGTH_SHORT).show()
-                               }
-                               IconType.MUTE -> {
-                                   Toast.makeText(this, "MUTE",
-                                       Toast.LENGTH_SHORT).show()
-                               }
-                               IconType.ROTATE -> {
-                                   Toast.makeText(this, "ROTATE",
-                                       Toast.LENGTH_SHORT).show()
-                               }
-                               IconType.BACK -> {
-                                   Toast.makeText(this, "BACK",
-                                       Toast.LENGTH_SHORT).show()
-                               }
+        when(partItem.type){
+            IconType.NIGHT -> {
+                Toast.makeText(this, "NIGHT $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.MUTE -> {
+                Toast.makeText(this, "MUTE $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.ROTATE -> {
+                Toast.makeText(this, "ROTATE $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.BACK -> {
+
+                if (!expand) {
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_volume_off,
+                            "Volume",
+                            IconType.VOLUME
+                        )
+                    )
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_brightness,
+                            "Brightness",
+                            IconType.BRIGHTNESS
+                        )
+                    )
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_equalizer,
+                            "Equalizer",
+                            IconType.EQUALIZER
+                        )
+                    )
+                    iconModelArrayList.add(IconModel(R.drawable.ic_speed, "Speed", IconType.SPEED))
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_subtitles,
+                            "Subtitle",
+                            IconType.SUBTITLE
+                        )
+                    )
+                    iconModelArrayList[position] =
+                        IconModel(R.drawable.ic_left, "", IconType.COLLAPSE)
+
+                    iconModelLive.postValue(iconModelArrayList)
+
+                    expand = !expand
+
+                }
+                }
 
 
-                               else -> {}
-                           }
+            IconType.VOLUME -> {
+                Toast.makeText(this, "VOLUME $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.BRIGHTNESS -> {
+                Toast.makeText(this, "BRIGHTNESS $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.EQUALIZER -> {Toast.makeText(this, "EQUALIZER $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.SPEED -> {
+                Toast.makeText(this, "SPEED $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.SUBTITLE -> {
+                Toast.makeText(this, "SUBTITLE $position",
+                    Toast.LENGTH_SHORT).show()
+            }
+            IconType.COLLAPSE -> {
+
+
+            iconModelArrayList.clear()
+            iconModelArrayList.add(IconModel(R.drawable.ic_right,"",IconType.BACK))
+            iconModelArrayList.add(IconModel(R.drawable.ic_night_mode,"Night",IconType.NIGHT))
+            iconModelArrayList.add(IconModel(R.drawable.ic_volume_off,"Mute",IconType.MUTE))
+            iconModelArrayList.add(IconModel(R.drawable.ic_rotate,"Rotate",IconType.ROTATE))
+            iconModelLive.postValue(iconModelArrayList)
+
+                expand = !expand
+
+
+
+            }
+
+        }
     }
     private fun addMP4Files() {
         val mediaItem1 = MediaItem.fromUri(getString(R.string.media_url_mkv))
