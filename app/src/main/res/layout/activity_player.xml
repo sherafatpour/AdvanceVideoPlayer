@@ -26,6 +26,13 @@
     android:layout_gravity="center"
     android:id="@+id/progressBar"
     style="?android:attr/progressBarStyle"
-
     />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/night_mode"
+        android:background="@color/light_black"
+        android:visibility="gone"
+        />
 </FrameLayout>
