@@ -1,6 +1,7 @@
 package com.sherafatpour.advancevideoplayer
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.media.audiofx.AudioEffect
 import android.net.Uri
@@ -23,6 +24,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.common.collect.ImmutableList
 import com.sherafatpour.advancevideoplayer.databinding.ActivityPlayerBinding
 import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,12 +40,13 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
     private lateinit var scaling: ImageView
     private lateinit var root: RelativeLayout
     private lateinit var recyclerViewIcons: RecyclerView
+    private lateinit var parameters: PlaybackParameters
     lateinit var controlsMode: ControlsMode
     lateinit var playbackIconsAdapter: PlaybackIconsAdapter
     private var expand: Boolean = false
     private var darkMode: Boolean = false
-
     private val iconModelArrayList = ArrayList<IconModel>()
+    private var speed: Float = 1f
 
     //horizontal recyclerview variables
     var iconModelLive = MutableLiveData<List<IconModel>>()
@@ -197,7 +200,7 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
             IconType.BRIGHTNESS -> {
 
                 val brightnessDialog = BrightnessDialog()
-                brightnessDialog.show(supportFragmentManager,"dialog")
+                brightnessDialog.show(supportFragmentManager, "dialog")
                 playbackIconsAdapter.notifyItemChanged(position)
 
             }
@@ -205,10 +208,10 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
 
 
                 val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-                if ((intent.resolveActivity(packageManager)) !=null){
-                    startActivityForResult(intent,123)
+                if ((intent.resolveActivity(packageManager)) != null) {
+                    startActivityForResult(intent, 123)
 
-                }else{
+                } else {
 
                     Toast.makeText(
                         this, "No Equalizer Found",
@@ -225,10 +228,67 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
 
             }
             IconType.SPEED -> {
-                Toast.makeText(
-                    this, "SPEED $position",
-                    Toast.LENGTH_SHORT
-                ).show()
+
+                val checkedItem = -1
+                val items = arrayOf("0.5x", "1x Normal", "1.25x", "1.5", "2x")
+
+                val alertDialog = AlertDialog.Builder(this@PlayerActivity).apply {
+                    setTitle("Select Playback Speed")
+
+                    setSingleChoiceItems(
+                        items, checkedItem
+                    ) { dialog, which ->
+
+
+                        when (which) {
+                            0 -> {
+                                speed = 0.5f
+                                parameters = PlaybackParameters(speed)
+                                player.playbackParameters = parameters
+dialog.dismiss()
+                            }
+                            1 -> {
+                                speed = 1f
+                                parameters = PlaybackParameters(speed)
+                                player.playbackParameters = parameters
+                                dialog.dismiss()
+
+                            }
+                            2 -> {
+
+                                speed = 1.25f
+                                parameters = PlaybackParameters(speed)
+                                player.playbackParameters = parameters
+                                dialog.dismiss()
+
+                            }
+                            3 -> {
+                                speed = 1.5f
+                                parameters = PlaybackParameters(speed)
+                                player.playbackParameters = parameters
+                                dialog.dismiss()
+
+                            }
+                            4 -> {
+
+                                speed = 2f
+                                parameters = PlaybackParameters(speed)
+                                player.playbackParameters = parameters
+                                dialog.dismiss()
+
+                            }
+
+
+                        }
+
+
+                    }
+
+
+                }
+                val alert = alertDialog.create()
+                alert.show()
+
             }
             IconType.SUBTITLE -> {
                 Toast.makeText(
@@ -248,9 +308,21 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
 
 
                 if (player.deviceVolume > 0) {
-                    iconModelArrayList.add( IconModel(R.drawable.ic_volume_off, "Mute", IconType.MUTE))
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_volume_off,
+                            "Mute",
+                            IconType.MUTE
+                        )
+                    )
                 } else {
-                    iconModelArrayList.add(IconModel(R.drawable.ic_volume, "unMute", IconType.VOLUME))
+                    iconModelArrayList.add(
+                        IconModel(
+                            R.drawable.ic_volume,
+                            "unMute",
+                            IconType.VOLUME
+                        )
+                    )
 
                 }
 
