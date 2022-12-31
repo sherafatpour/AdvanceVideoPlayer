@@ -193,6 +193,11 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
                     this, "BRIGHTNESS $position",
                     Toast.LENGTH_SHORT
                 ).show()
+
+                val brightnessDialog = BrightnessDialog()
+                brightnessDialog.show(supportFragmentManager,"dialog")
+                playbackIconsAdapter.notifyItemChanged(position)
+
             }
             IconType.EQUALIZER -> {
                 Toast.makeText(

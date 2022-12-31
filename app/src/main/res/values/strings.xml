@@ -47,4 +47,6 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_of_video">This is title of video</string>
+    <string name="volume">Volume</string>
+    <string name="brightness">Brightness</string>
 </resources>
