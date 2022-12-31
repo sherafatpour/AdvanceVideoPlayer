@@ -1,7 +1,12 @@
 package com.sherafatpour.advancevideoplayer
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.media.audiofx.AudioEffect
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.WindowInsets
@@ -117,6 +122,7 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
     }
 
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun iconItemClicked(partItem: IconModel, position: Int) {
 
         when (partItem.type) {
@@ -189,10 +195,6 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
                 }
             }
             IconType.BRIGHTNESS -> {
-                Toast.makeText(
-                    this, "BRIGHTNESS $position",
-                    Toast.LENGTH_SHORT
-                ).show()
 
                 val brightnessDialog = BrightnessDialog()
                 brightnessDialog.show(supportFragmentManager,"dialog")
@@ -200,10 +202,27 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
 
             }
             IconType.EQUALIZER -> {
-                Toast.makeText(
-                    this, "EQUALIZER $position",
-                    Toast.LENGTH_SHORT
-                ).show()
+
+
+                val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
+                if ((intent.resolveActivity(packageManager)) !=null){
+                    startActivityForResult(intent,123)
+
+                }else{
+
+                    Toast.makeText(
+                        this, "No Equalizer Found",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+
+
+
+
+                playbackIconsAdapter.notifyItemChanged(position)
+
+
             }
             IconType.SPEED -> {
                 Toast.makeText(
