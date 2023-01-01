@@ -75,7 +75,7 @@ class PlayerActivity : AppCompatActivity(), Player.Listener, View.OnClickListene
         lock.setOnClickListener(this)
         unLock.setOnClickListener(this)
         root.setOnClickListener(this)
-        scaling.setOnClickListener(this)
+        scaling.setOnClickListener(firstListener)
 
         setupPlayer()
         initIconsRecyclerview()
@@ -482,7 +482,9 @@ dialog.dismiss()
                 lock.visibility = View.VISIBLE
                 Toast.makeText(this@PlayerActivity, "Locked", Toast.LENGTH_SHORT).show()
             }
-            R.id.scaling -> {}
+            R.id.scaling -> {
+
+            }
 
 
         }
